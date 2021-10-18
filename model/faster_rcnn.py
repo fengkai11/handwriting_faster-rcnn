@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division #division float
 from torch import nn
 #extrat feature generate proposal and roi for pooling;
+#
 class FasterRCNN(nn.Module):
     def __init__(self,extrator,rpn,head):
         self.head = head

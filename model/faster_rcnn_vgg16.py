@@ -30,6 +30,7 @@ class FasterRCNNVGG16(FasterRCNN):#how to init FasterRCNN
                                     anchor_scales = anchor_scales,
                                     feat_stride = feat_stride)
 
+
 if __name__ == '__main__':
     model = decom_vgg16()
     print(model)
