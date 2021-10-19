@@ -34,15 +34,15 @@ class ProposalCreator(object):
         min_size = self.min_size*scale
         hs = roi[:,2] - roi[:,0]
         ws = roi[:,3] - roi[:,1]
-        keep = np.where(hs>=min_size and ws>=min_size)[0]
+        keep = np.where(hs.any()>=min_size and ws.any()>=min_size)[0]
         roi = roi[keep,:]
         score = score[keep,:]
         order = score.ravel().argsort()[::-1]#big2small
         order = order[:n_pre_nms]
         roi = roi[order,:]
         score = score[order]
-        keep_nms = nms(torch.from_numpy(roi).cuda(),
-                   torch.from_numpy(score).cuda,
+        keep_nms = nms(torch.from_numpy(roi).cpu(),
+                   torch.from_numpy(score).cpu(),
                    self.nms_thresh)
         keep_nms = keep_nms[:n_post_nms]
         roi = roi[keep_nms.cpu().numpy()]

@@ -30,10 +30,12 @@ class RegionProposalNetwork(nn.Module):
         shift = np.stack((my.ravel(),mx.ravel(),my.ravel(),mx.ravel()),axis=1)
         anchor = anchor_base.reshape(1,-1,4)+shift.reshape(1,-1,4).transpose((1,0,2))
         anchor = anchor.reshape((-1,4))#anchor_base...
+        return anchor
     def forward(self, x, img_size, scale =1, n_anchor=None):
         n,_,hh,ww = x.shape
         anchor = self.enumerate_shifted_anchor(self.anchor_base,self.feat_stride,hh,ww)#call function
         n_anchor = anchor.shape[0]//(hh*ww)
+        print(x.size())
         h = F.relu(self.conv1(x))
         rpn_loc = self.loc(x)
         rpn_score = self.score(x)
@@ -46,11 +48,12 @@ class RegionProposalNetwork(nn.Module):
         rois = []
         rois_indices = []
         for i in range(n):
-            roi = self.proposal_layer(rpn_loc[i].cpu().numpy(),
-                                      rpn_fg_scores.cpu().numpy(),
+            roi = self.proposal_layer(rpn_loc[i].cpu().detach().numpy(),#Can't call numpy() on Variable that requires grad. Use var.detach().numpy() instead
+                                      rpn_fg_scores.cpu().detach().numpy(),
                                       anchor,
                                       img_size,
                                       scale = scale)
+
             batch_index = i*np.ones(len(roi))
             rois.append(roi)
             rois_indices.append(batch_index)

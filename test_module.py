@@ -4,23 +4,25 @@ from torch import nn
 import torch
 from PIL import Image
 import numpy as np
+import collections
+import cv2
 #1. test extractor
 #FIXME:class inherit
 class RPN(nn.Module):
     def __init__(self,extractor,RegionProposalNetwork):
         super(RPN,self).__init__()#@1
         self.extractor = extractor
-        self.head = RegionProposalNetwork
+        self.rpn = RegionProposalNetwork
     def forward(self,x):
         img_size = x.size()[2:]
         x = self.extractor(x)
-        result = self.head(x,img_size,1)
+        result = self.rpn(x,img_size,1)
         return result
 class Test(RPN):
     def __init__(self):
         features = decom_vgg16()
-        rpn = RegionProposalNetwork()
-        super(Test,self).__init__(features,rpn)
+        test_rpn = RegionProposalNetwork()
+        super(Test,self).__init__(features,test_rpn)
 #2. test region proposal
 def load_img(path):
     img = Image.open(path)
@@ -58,6 +60,14 @@ if __name__ == '__main__':
     '''
     # 2. test region proposal
     model = Test()
-    model = model.state_dict(torch.load(r'D:\BaiduNetdiskDownload\simple-faster-rcnn\fasterrcnn_12211511_0.701052458187_torchvision_pretrain.pth',map_location = torch.device('cpu')))
+    pretrained_model = torch.load(r'D:\BaiduNetdiskDownload\simple-faster-rcnn\fasterrcnn_12211511_0.701052458187_torchvision_pretrain.pth',map_location = torch.device('cpu'))
+    layer_names = model.state_dict().keys()
+    sub_model = collections.OrderedDict()
+    for item in layer_names:
+        sub_model[item] = pretrained_model['model'][item]
+
+    model.load_state_dict(sub_model)
+    #model load ok
     im_t = load_img(r'D:/tmp.jpg')
-    model.forward(im_t)
+    loc,score,_,_,_ = model.forward(im_t)
+    i = 1
