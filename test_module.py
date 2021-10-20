@@ -65,7 +65,6 @@ if __name__ == '__main__':
     sub_model = collections.OrderedDict()
     for item in layer_names:
         sub_model[item] = pretrained_model['model'][item]
-
     model.load_state_dict(sub_model)
     #model load ok
     im_t = load_img(r'D:/tmp.jpg')

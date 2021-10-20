@@ -41,11 +41,5 @@ def loc2bbox(anchor,loc):
     dst_bbox[:,2::4] = ctr_y+0.5*h
     dst_bbox[:,3::4] = ctr_x+0.5*w
     return dst_bbox
-
-
-
-
-
-
 if __name__ == "__main__":
     tmp = generate_anchor_base()
